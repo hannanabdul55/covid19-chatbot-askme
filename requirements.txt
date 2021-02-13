@@ -1,0 +1,7 @@
+pandas
+gunicorn
+Flask
+django
+django-heroku
+pip
+setuptools
