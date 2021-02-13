@@ -51,15 +51,17 @@ unexpected_error_response = {
   ]
 }
 
-# deaths = pd.read_csv('https://github.com/reichlab/covid19-forecast-hub/raw/master/data-truth/truth-Incident%20Deaths.csv')
-cases = pd.read_csv('https://github.com/reichlab/covid19-forecast-hub/raw/master/data-truth/truth-Incident%20Cases.csv')
-# deaths['date'] = pd.to_datetime(deaths.date)
+locations = pd.read_csv('https://github.com/reichlab/covid19-forecast-hub/raw/master/data-locations/locations.csv')
+deaths = pd.read_csv('https://github.com/reichlab/covid19-forecast-hub/raw/master/data-truth/truth-Incident%20Deaths.csv').merge(locations, how='left', on=['location', 'location_name']).dropna(subset=['abbreviation'])
+
+cases = pd.read_csv('https://github.com/reichlab/covid19-forecast-hub/raw/master/data-truth/truth-Incident%20Cases.csv').merge(locations, how='left', on=['location', 'location_name']).dropna(subset=['abbreviation'])
+deaths['date'] = pd.to_datetime(deaths.date)
 cases['date'] = pd.to_datetime(cases.date)
 
-locations = pd.read_csv('https://github.com/reichlab/covid19-forecast-hub/raw/master/data-locations/locations.csv')
+
 
 # deaths = deaths.merge(locations, how='left', on=['location', 'location_name'])
-cases = cases.merge(locations, how='left', on=['location', 'location_name'])
+# cases = cases.merge(locations, how='left', on=['location', 'location_name'])
 
 
 @app.route('/', methods=['GET','POST'])
@@ -75,7 +77,7 @@ def hello_world():
 
 def parse_response(req):
     try:
-        intent = "Cases"#req['intent']
+        intent = req['queryResult']['intent']
         state = req['queryResult']['parameters']["geo-state"]
         dates = req['queryResult']['parameters']['date-period']
         date = None
@@ -88,9 +90,9 @@ def parse_response(req):
 
         # intent_val = str(intent['displayName']).lower()
         val = -1
-        # if intent['displayName'] == "Deaths":
-        #     val = deaths.loc[(deaths['location_name'] == state) & (deaths['date'] == date.strftime('%Y-%m-%d'))].iloc[0]['value']
-        if intent == "Cases":
+        if intent['displayName'] == "Deaths":
+            val = deaths.loc[(deaths['location_name'] == state) & (deaths['date'] == date.strftime('%Y-%m-%d'))].iloc[0]['value']
+        if intent['displayName'] == "Cases":
             val = cases.loc[(cases['location_name'] == state) & (cases['date'] == date.strftime('%Y-%m-%d'))].iloc[0]['value']
         return create_response_obj(f"The number of {intent} for {state} is {val}")
 
