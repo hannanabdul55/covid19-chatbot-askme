@@ -52,9 +52,9 @@ unexpected_error_response = {
 }
 
 locations = pd.read_csv('https://github.com/reichlab/covid19-forecast-hub/raw/master/data-locations/locations.csv')
-deaths = pd.read_csv('https://github.com/reichlab/covid19-forecast-hub/raw/master/data-truth/truth-Incident%20Deaths.csv').merge(locations, how='left', on=['location', 'location_name']).dropna(subset=['abbreviation'])
+deaths = pd.read_csv('https://github.com/hannanabdul55/covid19-forecast-hub/raw/master/data-truth/truth-Incident%20Deaths.csv').merge(locations, how='left', on=['location', 'location_name']).dropna(subset=['abbreviation'])
 
-cases = pd.read_csv('https://github.com/reichlab/covid19-forecast-hub/raw/master/data-truth/truth-Incident%20Cases.csv').merge(locations, how='left', on=['location', 'location_name']).dropna(subset=['abbreviation'])
+cases = pd.read_csv('https://github.com/hannanabdul55/covid19-forecast-hub/raw/master/data-truth/truth-Incident%20Cases.csv').merge(locations, how='left', on=['location', 'location_name']).dropna(subset=['abbreviation'])
 deaths['date'] = pd.to_datetime(deaths.date)
 cases['date'] = pd.to_datetime(cases.date)
 
@@ -91,10 +91,10 @@ def parse_response(req):
         # intent_val = str(intent['displayName']).lower()
         val = -1
         if intent['displayName'] == "Deaths":
-            val = deaths.loc[(deaths['location_name'] == state) & (deaths['date'] == date.strftime('%Y-%m-%d'))].iloc[0]['value']
+            val = pd.sum(deaths.loc[(deaths['location_name'] == state) & (deaths['date'] == date.strftime('%Y-%m-%d'))]['value'])
         if intent['displayName'] == "Cases":
-            val = cases.loc[(cases['location_name'] == state) & (cases['date'] == date.strftime('%Y-%m-%d'))].iloc[0]['value']
-        return create_response_obj(f"The number of {intent} for {state} is {val}")
+            val = pd.sum(cases.loc[(cases['location_name'] == state) & (cases['date'] == date.strftime('%Y-%m-%d'))]['value'])
+        return create_response_obj(f"The number of {intent['displayName']} for {state} is {val}")
 
 
 
