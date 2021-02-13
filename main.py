@@ -75,7 +75,7 @@ def hello_world():
 
 def parse_response(req):
     try:
-        intent = req['intent']
+        intent = "Cases"#req['intent']
         state = req['queryResult']['parameters']["geo-state"]
         dates = req['queryResult']['parameters']['date-period']
         date = None
