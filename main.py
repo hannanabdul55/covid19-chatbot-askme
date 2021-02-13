@@ -91,9 +91,9 @@ def parse_response(req):
         # intent_val = str(intent['displayName']).lower()
         val = -1
         if intent['displayName'] == "Deaths":
-            val = pd.sum(deaths.loc[(deaths['location_name'] == state) & (deaths['date'] == date.strftime('%Y-%m-%d'))]['value'])
+            val = deaths.loc[(deaths['location_name'] == state) & (deaths['date'] == date.strftime('%Y-%m-%d'))]['value'].sum()
         if intent['displayName'] == "Cases":
-            val = pd.sum(cases.loc[(cases['location_name'] == state) & (cases['date'] == date.strftime('%Y-%m-%d'))]['value'])
+            val = cases.loc[(cases['location_name'] == state) & (cases['date'] == date.strftime('%Y-%m-%d'))]['value'].sum()
         return create_response_obj(f"The number of {intent['displayName']} for {state} is {val}")
 
 
