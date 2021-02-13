@@ -55,8 +55,8 @@ locations = pd.read_csv('https://github.com/reichlab/covid19-forecast-hub/raw/ma
 deaths = pd.read_csv('https://github.com/hannanabdul55/covid19-forecast-hub/raw/master/data-truth/truth-Incident%20Deaths.csv').merge(locations, how='left', on=['location', 'location_name']).dropna(subset=['abbreviation'])
 
 cases = pd.read_csv('https://github.com/hannanabdul55/covid19-forecast-hub/raw/master/data-truth/truth-Incident%20Cases.csv').merge(locations, how='left', on=['location', 'location_name']).dropna(subset=['abbreviation'])
-deaths['date'] = pd.to_datetime(deaths.date)
-cases['date'] = pd.to_datetime(cases.date)
+deaths['date'] = pd.to_datetime(deaths.date, infer_datetime_format=True)
+cases['date'] = pd.to_datetime(cases.date, infer_datetime_format=True)
 
 
 
@@ -81,8 +81,13 @@ def parse_response(req):
         state = req['queryResult']['parameters']["geo-state"]
         dates = req['queryResult']['parameters']['date-period']
         date = None
+        range = False
         if dates is None or dates == "":
             date = datetime.now().date()
+        elif 'endDate' in dates and 'startDate' in dates:
+            range = True
+            start_date = parser.parse(dates['startDate']).date()
+            end_date = parser.parse(dates['endDate']).date()
         elif 'endDate' in dates:
             date = parser.parse(dates['endDate']).date()
         elif 'startDate' in dates:
@@ -91,9 +96,20 @@ def parse_response(req):
         # intent_val = str(intent['displayName']).lower()
         val = -1
         if intent['displayName'] == "Deaths":
-            val = deaths.loc[(deaths['location_name'] == state) & (deaths['date'] == date.strftime('%Y-%m-%d'))]['value'].sum()
+            if not range:
+                val = deaths.loc[(deaths['location_name'] == state) & (deaths['date'] == date.strftime('%Y-%m-%d'))]['value'].sum()
+            else:
+                val = deaths.loc[(deaths['location_name'] == state) & (
+                            deaths['date'] >= start_date.strftime('%Y-%m-%d'))& (
+                            deaths['date'] <= end_date.strftime('%Y-%m-%d'))]['value'].sum()
         if intent['displayName'] == "Cases":
-            val = cases.loc[(cases['location_name'] == state) & (cases['date'] == date.strftime('%Y-%m-%d'))]['value'].sum()
+            if not range:
+                val = cases.loc[(cases['location_name'] == state) & (cases['date'] == date.strftime('%Y-%m-%d'))]['value'].sum()
+            else:
+                val = cases.loc[(cases['location_name'] == state) & (
+                            cases['date'] >= start_date.strftime('%Y-%m-%d'))& (
+                            cases['date'] <= end_date.strftime('%Y-%m-%d'))]['value'].sum()
+            # val = cases.loc[(cases['location_name'] == state) & (cases['date'] == date.strftime('%Y-%m-%d'))]['value'].sum()
         return create_response_obj(f"The number of {intent['displayName']} for {state} is {val}")
 
 
