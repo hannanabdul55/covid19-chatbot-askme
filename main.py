@@ -99,9 +99,9 @@ def parse_response(req):
     except KeyError as e:
         eprint("KeyError parsing response", e)
         return error_response
-    except:
-        eprint("Unexpected error parsing response")
-        return unexpected_error_response
+    # except:
+    #     eprint("Unexpected error parsing response")
+    #     return unexpected_error_response
 
 
 
