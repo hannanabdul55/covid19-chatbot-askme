@@ -58,7 +58,7 @@ cases = pd.read_csv('https://github.com/hannanabdul55/covid19-forecast-hub/raw/m
 deaths['date'] = pd.to_datetime(deaths.date, infer_datetime_format=True)
 cases['date'] = pd.to_datetime(cases.date, infer_datetime_format=True)
 
-
+date_format = '%Y-%m-%d'
 
 # deaths = deaths.merge(locations, how='left', on=['location', 'location_name'])
 # cases = cases.merge(locations, how='left', on=['location', 'location_name'])
@@ -97,20 +97,27 @@ def parse_response(req):
         val = -1
         if intent['displayName'] == "Deaths":
             if not range:
-                val = deaths.loc[(deaths['location_name'] == state) & (deaths['date'] == date.strftime('%Y-%m-%d'))]['value'].sum()
+                val = deaths.loc[(deaths['location_name'] == state) & (deaths['date'] == date.strftime(date_format))]['value'].sum()
             else:
                 val = deaths.loc[(deaths['location_name'] == state) & (
-                            deaths['date'] >= start_date.strftime('%Y-%m-%d'))& (
-                            deaths['date'] <= end_date.strftime('%Y-%m-%d'))]['value'].sum()
+                            deaths['date'] >= start_date.strftime(date_format))& (
+                            deaths['date'] <= end_date.strftime(date_format))]['value'].sum()
         if intent['displayName'] == "Cases":
             if not range:
                 val = cases.loc[(cases['location_name'] == state) & (cases['date'] == date.strftime('%Y-%m-%d'))]['value'].sum()
             else:
                 val = cases.loc[(cases['location_name'] == state) & (
-                            cases['date'] >= start_date.strftime('%Y-%m-%d'))& (
-                            cases['date'] <= end_date.strftime('%Y-%m-%d'))]['value'].sum()
+                            cases['date'] >= start_date.strftime(date_format))& (
+                            cases['date'] <= end_date.strftime(date_format))]['value'].sum()
             # val = cases.loc[(cases['location_name'] == state) & (cases['date'] == date.strftime('%Y-%m-%d'))]['value'].sum()
-        return create_response_obj(f"The number of {intent['displayName']} for {state} is {val}")
+        if val ==0:
+            final_resp = f"There were no {intent['displayName'].lower()} "
+        else:
+            final_resp = f"There were {val} {intent['displayName'].lower()} "
+        if range is True:
+            final_resp += f"from {start_date.strftime(date_format)} to {end_date.strftime(date_format)} "
+        final_resp += f"for the state of {state}."
+        return create_response_obj(final_resp)
 
 
 
