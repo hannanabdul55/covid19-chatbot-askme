@@ -59,6 +59,7 @@ deaths['date'] = pd.to_datetime(deaths.date, infer_datetime_format=True)
 cases['date'] = pd.to_datetime(cases.date, infer_datetime_format=True)
 
 date_format = '%Y-%m-%d'
+text_date_format = '%a %b %d %Y'
 
 # deaths = deaths.merge(locations, how='left', on=['location', 'location_name'])
 # cases = cases.merge(locations, how='left', on=['location', 'location_name'])
@@ -115,7 +116,9 @@ def parse_response(req):
         else:
             final_resp = f"There were {val} {intent['displayName'].lower()} "
         if range is True:
-            final_resp += f"from {start_date.strftime(date_format)} to {end_date.strftime(date_format)} "
+            final_resp += f"from {start_date.strftime(text_date_format)} to {end_date.strftime(text_date_format)} "
+        elif date is not None:
+            final_resp += f"on {date.strftime(text_date_format)} "
         final_resp += f"for the state of {state}."
         return create_response_obj(final_resp)
 
