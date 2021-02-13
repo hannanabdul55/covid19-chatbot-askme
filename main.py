@@ -90,9 +90,9 @@ def parse_response(req):
         val = -1
         # if intent['displayName'] == "Deaths":
         #     val = deaths.loc[(deaths['location_name'] == state) & (deaths['date'] == date.strftime('%Y-%m-%d'))].iloc[0]['value']
-        if intent['displayName'] == "Cases":
+        if intent == "Cases":
             val = cases.loc[(cases['location_name'] == state) & (cases['date'] == date.strftime('%Y-%m-%d'))].iloc[0]['value']
-        return create_response_obj(f"The number of {intent['displayName']} for {state} is {val}")
+        return create_response_obj(f"The number of {intent} for {state} is {val}")
 
 
 
