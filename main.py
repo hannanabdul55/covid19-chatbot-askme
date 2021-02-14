@@ -84,7 +84,10 @@ def parse_response(req):
         date = None
         range = False
         if dates is None or dates == "":
-            date = datetime.now().date()
+            if 'date-time' in req['queryResult']['parameters'] and req['queryResult']['parameters']['date-time']!='':
+                date = parser.parse(req['queryResult']['parameters']['date-time'])
+            else:
+                date = datetime.now().date()
         elif 'endDate' in dates and 'startDate' in dates:
             range = True
             start_date = parser.parse(dates['startDate']).date()
