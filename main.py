@@ -83,11 +83,8 @@ def parse_response(req):
         dates = req['queryResult']['parameters']['date-period']
         date = None
         range = False
-        if dates is None or dates == "":
-            if 'date-time' in req['queryResult']['parameters'] and req['queryResult']['parameters']['date-time']!='':
-                date = parser.parse(req['queryResult']['parameters']['date-time'])
-            else:
-                date = datetime.now().date()
+        if 'date-time' in req['queryResult']['parameters'] and req['queryResult']['parameters']['date-time']!='':
+            date = parser.parse(req['queryResult']['parameters']['date-time'])
         elif 'endDate' in dates and 'startDate' in dates:
             range = True
             start_date = parser.parse(dates['startDate']).date()
@@ -96,6 +93,8 @@ def parse_response(req):
             date = parser.parse(dates['endDate']).date()
         elif 'startDate' in dates:
             date = parser.parse(dates['startDate']).date()
+        else:
+            date = datetime.now().date()
 
         # intent_val = str(intent['displayName']).lower()
         val = -1
